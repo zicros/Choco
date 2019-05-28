@@ -1,4 +1,4 @@
-$rootLocation = Get-Item .\
+$rootLocation = Get-Item "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
 $packageStorePath = Join-Path $rootLocation 'Packages'
 
 # Get the package location or create the folder if it doesn't exist.
@@ -20,7 +20,11 @@ $nuspecs = Get-ChildItem -Path $rootLocation -File -Recurse -Filter *.nuspec
 
 foreach ($nuspec in $nuspecs)
 {
-    Write-Host "Building $($nuspec.FullName)"
-    choco pack $nuspec.Fullname --out $packageStoreLocation.FullName
+    # Ignore scripts in current directory
+    if ($nuspec.Directory.FullName -ne $rootLocation.FullName)
+    {
+        Write-Host "Building $($nuspec.FullName)"
+        choco pack $nuspec.Fullname --out $packageStoreLocation.FullName
+    }
 }
 
